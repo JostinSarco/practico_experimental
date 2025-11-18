@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="table-container">
+  <br>
+  <h1 class="title">{{ title2|upper }}</h1>
+  <form method="get">
+    <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar por descripción">
+    <button type="submit">Buscar</button>
+  </form>
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>Descripción</th>
+        <th>Marca</th>
+        <th>Proveedor</th>
+        <th>Precio</th>
+        <th>Stock</th>
+        <th>IVA</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in products %}
+      <tr>
+        <td>{{ item.description }}</td>
+        <td>{{ item.brand }}</td>
+        <td>{{ item.supplier }}</td>
+        <td>${{ item.price }}</td>
+        <td>{{ item.stock }}</td>
+        <td>{{ item.get_iva_display }}</td>
+        <td>
+          {% if item.state %}
+            <span class="badge bg-success">Activo</span>
+          {% else %}
+            <span class="badge bg-danger">Inactivo</span>
+          {% endif %}
+        </td>
+        <td>
+          <a href="{% url 'core:product_detail' item.id %}" class="btn btn-sm btn-outline-primary">🔎</a>
+          <a href="{% url 'core:product_update' item.id %}" class="btn btn-sm btn-warning">✏️</a>
+          <a href="{% url 'core:product_delete' item.id %}" class="btn btn-sm btn-danger">🗑️</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="8" style="text-align:center;">No hay productos registrados.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="form-group mt-3">
+    <a class="btn blue" href="{% url 'core:product_create' %}">➕ Nuevo Producto</a>
+  </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Empleados</h1>
+<p><a class="btn btn-primary" href="{% url 'nomina:empleado_create' %}">Nuevo Empleado</a></p>
+<table class="table table-striped">
+  <thead>
+    <tr><th>ID</th><th>Nombres</th><th>Sueldo</th><th>Acciones</th></tr>
+  </thead>
+  <tbody>
+    {% for e in object_list %}
+    <tr>
+      <td>{{ e.id }}</td>
+      <td>{{ e.nombres }}</td>
+      <td>{{ e.sueldo }}</td>
+      <td>
+        <a href="{% url 'nomina:empleado_edit' e.id %}">Editar</a> |
+        <a href="{% url 'nomina:empleado_delete' e.id %}">Borrar</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">No hay empleados</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13px;
+      background: #f8f9fa;
+      color: #222;
+    }
+    .header {
+      background: #198754;
+      color: #fff;
+      padding: 18px 24px 10px 24px;
+      border-radius: 8px 8px 0 0;
+      margin-bottom: 0;
+    }
+    .header h2 {
+      margin: 0;
+      font-size: 1.5em;
+      letter-spacing: 1px;
+    }
+    .info {
+      background: #e9ecef;
+      padding: 12px 24px;
+      border-radius: 0 0 8px 8px;
+      margin-bottom: 18px;
+    }
+    .info strong { color: #198754; }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 18px;
+    }
+    .table th {
+      background: #198754;
+      color: #fff;
+      padding: 7px 4px;
+      border: 1px solid #198754;
+      font-size: 1em;
+    }
+    .table td {
+      border: 1px solid #dee2e6;
+      padding: 6px 4px;
+      background: #fff;
+    }
+    .table tr:nth-child(even) td {
+      background: #f6f6f6;
+    }
+    .totals {
+      width: 40%;
+      float: right;
+      margin-top: 10px;
+    }
+    .totals td {
+      padding: 6px 8px;
+      font-size: 1em;
+    }
+    .totals .label {
+      text-align: right;
+      color: #555;
+    }
+    .totals .value {
+      text-align: right;
+      font-weight: bold;
+    }
+    .totals .total-row {
+      background: #198754;
+      color: #fff;
+      font-size: 1.1em;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>Compra N° {{ purchase.id }}</h2>
+  </div>
+  <div class="info">
+    <strong>Proveedor:</strong> {{ purchase.supplier.name }}<br>
+    <strong>RUC:</strong> {{ purchase.supplier.ruc }}<br>
+    <strong>Dirección:</strong> {{ purchase.supplier.address }}<br>
+    <strong>Fecha:</strong> {{ purchase.issue_date|date:"d/m/Y H:i" }}<br>
+    <strong>N° Documento:</strong> {{ purchase.num_document }}<br>
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Descripción</th>
+        <th>Cantidad</th>
+        <th>Costo</th>
+        <th>IVA</th>
+        <th>Subtotal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for det in details %}
+      <tr>
+        <td>{{ det.product.id }}</td>
+        <td>{{ det.product.description }}</td>
+        <td style="text-align:center;">{{ det.quantify|floatformat:2 }}</td>
+        <td style="text-align:right;">${{ det.cost|floatformat:2 }}</td>
+        <td style="text-align:right;">${{ det.iva|floatformat:2 }}</td>
+        <td style="text-align:right; font-weight:bold;">${{ det.subtotal|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <table class="totals">
+    <tr>
+      <td class="label">Subtotal:</td>
+      <td class="value">${{ purchase.subtotal|floatformat:2 }}</td>
+    </tr>
+    <tr>
+      <td class="label">IVA:</td>
+      <td class="value">${{ purchase.iva|floatformat:2 }}</td>
+    </tr>
+    <tr class="total-row">
+      <td class="label">Total:</td>
+      <td class="value">${{ purchase.total|floatformat:2 }}</td>
+    </tr>
+  </table>
+</body>

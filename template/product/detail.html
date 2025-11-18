@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>{{ title2 }}</h2>
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">{{ product.description }}</h4>
+      <p><strong>Marca:</strong> {{ product.brand }}</p>
+      <p><strong>Proveedor:</strong> {{ product.supplier }}</p>
+      <p><strong>Precio:</strong> ${{ product.price }}</p>
+      <p><strong>Costo:</strong> ${{ product.cost }}</p>
+      <p><strong>Stock:</strong> {{ product.stock }}</p>
+      <p><strong>IVA:</strong> {{ product.get_iva_display }}</p>
+      <p><strong>Categorías:</strong> {{ product.get_categories }}</p>
+      <p><strong>Estado:</strong> {% if product.state %}<span class="badge bg-success">Activo</span>{% else %}<span class="badge bg-danger">Inactivo</span>{% endif %}</p>
+      <p><strong>Fecha de Caducidad:</strong> {{ product.expiration_date|date:"d/m/Y H:i" }}</p>
+      {% if product.image %}
+        <img src="{{ product.image.url }}" alt="Imagen" class="img-thumbnail" style="max-width:200px;">
+      {% endif %}
+    </div>
+  </div>
+  <a href="{% url 'core:product_list' %}" class="btn btn-secondary mt-3">Volver al listado</a>
+</div>
+{% endblock content %}

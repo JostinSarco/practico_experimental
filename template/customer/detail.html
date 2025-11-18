@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ title2 }}</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ customer.get_full_name }}</h5>
+            <p class="card-text"><strong>DNI:</strong> {{ customer.dni }}</p>
+            <p class="card-text"><strong>Teléfono:</strong> {{ customer.phone }}</p>
+            <p class="card-text"><strong>Correo:</strong> {{ customer.email }}</p>
+            <p class="card-text"><strong>Dirección:</strong> {{ customer.address }}</p>
+            <p class="card-text"><strong>Sexo:</strong> {{ customer.get_gender_display }}</p>
+            <p class="card-text"><strong>Fecha de nacimiento:</strong> {{ customer.date_of_birth }}</p>
+            <p class="card-text"><strong>Estado:</strong> {{ customer.state|yesno:"Activo,Inactivo" }}</p>
+            <p class="card-text"><strong>Creado:</strong> {{ customer.created }}</p>
+            <p class="card-text"><strong>Actualizado:</strong> {{ customer.updated }}</p>
+            {% if customer.image %}
+            <img src="{{ customer.image.url }}" alt="Foto" class="img-thumbnail" style="max-width:150px;">
+            {% endif %}
+            <a href="{% url 'core:customer_update' customer.id %}" class="btn btn-warning">Editar</a>
+            <a href="{% url 'core:customer_list' %}" class="btn btn-secondary">Volver</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

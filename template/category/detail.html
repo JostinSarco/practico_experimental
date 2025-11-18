@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ title2 }}</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ category.description }}</h5>
+            <p class="card-text"><strong>Estado:</strong> {{ category.state|yesno:"Activo,Inactivo" }}</p>
+            <p class="card-text"><strong>Creado:</strong> {{ category.created }}</p>
+            <p class="card-text"><strong>Actualizado:</strong> {{ category.updated }}</p>
+            <a href="{% url 'core:category_update' category.id %}" class="btn btn-warning">Editar</a>
+            <a href="{% url 'core:category_list' %}" class="btn btn-secondary">Volver</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

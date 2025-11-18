@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Detalle de Marca</h4>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Nombre</dt>
+                        <dd class="col-sm-8">{{ brand.description }}</dd>
+                        <dt class="col-sm-4">Estado</dt>
+                        <dd class="col-sm-8">{% if brand.state %}<span class="badge bg-success">Activo</span>{% else %}<span class="badge bg-danger">Inactivo</span>{% endif %}</dd>
+                        <dt class="col-sm-4">Creado</dt>
+                        <dd class="col-sm-8">{{ brand.created|date:"d/m/Y H:i" }}</dd>
+                        <dt class="col-sm-4">Actualizado</dt>
+                        <dd class="col-sm-8">{{ brand.updated|date:"d/m/Y H:i" }}</dd>
+                    </dl>
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'core:brand_list' %}" class="btn btn-secondary">Volver</a>
+                        <a href="{% url 'core:brand_update' brand.pk %}" class="btn btn-warning">Editar</a>
+                        <a href="{% url 'core:brand_delete' brand.pk %}" class="btn btn-danger">Eliminar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

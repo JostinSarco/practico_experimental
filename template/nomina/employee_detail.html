@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Empleado: {{ object.nombres }}</h1>
+  <p>Sueldo: {{ object.sueldo }}</p>
+  <p>
+    <a class="btn btn-primary" href="{% url 'nomina:empleado_edit' object.id %}">Editar</a>
+    <a class="btn btn-danger" href="{% url 'nomina:empleado_delete' object.id %}">Eliminar</a>
+    <a class="btn btn-secondary" href="{% url 'nomina:empleado_list' %}">Volver</a>
+  </p>
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{% if object %}Editar Sobretiempo{% else %}Crear Sobretiempo{% endif %}</h1>
+<form method="post">
+  {% csrf_token %}
+  <fieldset>
+    {{ form.as_p }}
+  </fieldset>
+
+  <h3>Detalles</h3>
+  {{ formset.management_form }}
+  <table class="table">
+    <thead>
+      <tr><th>Tipo</th><th>Horas</th><th>Valor</th><th>Eliminar</th></tr>
+    </thead>
+    <tbody>
+      {% for f in formset %}
+      <tr class="detail-row">
+        {# render hidden fields (id, ORDER, etc.) so Django can identify existing instances #}
+        {% for hidden in f.hidden_fields %}{{ hidden }}{% endfor %}
+        <td>{{ f.tipo_sobretiempo }}</td>
+        <td>{{ f.numero_horas }}</td>
+        <td class="valor">0.00</td>
+        <td>{% if f.DELETE %}{{ f.DELETE }}{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p>
+    <button type="button" id="add-detail" class="btn btn-success">Añadir detalle</button>
+  </p>
+
+  <p><strong>Total calculado (preview):</strong> <span id="total_calc_display">0.00</span></p>
+
+  <!-- empty form template for dynamic addition -->
+  <table style="display:none">
+    <tbody>
+      <tr id="empty-form-template">
+        {% for hidden in formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+        <td>{{ formset.empty_form.tipo_sobretiempo }}</td>
+        <td>{{ formset.empty_form.numero_horas }}</td>
+        <td class="valor">0.00</td>
+        <td>{{ formset.empty_form.DELETE }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <button class="btn btn-primary" type="submit">Guardar</button>
+  <a class="btn btn-secondary" href="{% url 'nomina:list' %}">Cancelar</a>
+</form>
+  {% if empleados_json and tipos_json %}
+  <script>
+    (function(){
+      const empleados = {{ empleados_json|safe }};
+      const tipos = {{ tipos_json|safe }};
+      const empleadoSelect = document.getElementById('id_empleado');
+      const sueldoField = document.getElementById('id_sueldo_mensual');
+      const totalHorasField = document.getElementById('id_total_horas');
+      const totalDisplay = document.getElementById('total_calc_display');
+      const tbody = document.querySelector('table.table tbody');
+      const addBtn = document.getElementById('add-detail');
+      const emptyRow = document.getElementById('empty-form-template');
+  // find management form inputs dynamically (works regardless of prefix)
+  const totalFormsInput = document.querySelector('input[name$="-TOTAL_FORMS"]');
+  const initialFormsInput = document.querySelector('input[name$="-INITIAL_FORMS"]');
+
+      function toNumber(v){
+        if(v === null || v === undefined) return 0;
+        const s = String(v).replace(',','.');
+        const n = parseFloat(s);
+        return isNaN(n) ? 0 : n;
+      }
+      function fmt(v){
+        return (Math.round((v + Number.EPSILON) * 100) / 100).toFixed(2);
+      }
+
+      function computeRowValue(tipoId, horas){
+        const sueldo = toNumber(sueldoField && sueldoField.value);
+        const totalHoras = toNumber(totalHorasField && totalHorasField.value) || 240;
+        const factor = toNumber((tipos && tipos[tipoId]) || 0);
+        const hourly = totalHoras ? (sueldo / totalHoras) : 0;
+        return horas * hourly * factor;
+      }
+
+      function updateRow(row){
+        const tipoEl = row.querySelector('select, input[name$="tipo_sobretiempo"]');
+        const horasEl = row.querySelector('input[name$="numero_horas"]');
+        if(!tipoEl || !horasEl) return;
+        const tipoId = tipoEl.value;
+        const horas = toNumber(horasEl.value);
+        const val = computeRowValue(tipoId, horas);
+        const valorCell = row.querySelector('.valor');
+        if(valorCell) valorCell.textContent = fmt(val);
+      }
+
+      function recalcAll(){
+        let total = 0;
+        document.querySelectorAll('tr.detail-row').forEach(function(r){
+          updateRow(r);
+          const v = toNumber(r.querySelector('.valor') && r.querySelector('.valor').textContent);
+          total += v;
+        });
+        if(totalDisplay) totalDisplay.textContent = fmt(total);
+      }
+
+      function attachRowListeners(row){
+        const tipoEl = row.querySelector('select, input[name$="tipo_sobretiempo"]');
+        const horasEl = row.querySelector('input[name$="numero_horas"]');
+        if(tipoEl) tipoEl.addEventListener('change', function(){ updateRow(row); recalcAll(); });
+        if(horasEl) horasEl.addEventListener('input', function(){ updateRow(row); recalcAll(); });
+      }
+
+      // initialize existing rows
+      document.querySelectorAll('tr.detail-row').forEach(function(r){ attachRowListeners(r); });
+
+      function actualizarSueldo(){ if(!empleadoSelect || !sueldoField) return; const val = empleados[empleadoSelect.value]; if(typeof val !== 'undefined' && val !== null){ sueldoField.value = val; } }
+
+      if(empleadoSelect){
+        empleadoSelect.addEventListener('change', function(){ actualizarSueldo(); recalcAll(); });
+      }
+      if(totalHorasField){ totalHorasField.addEventListener('input', recalcAll); }
+
+      // add new form row
+      if(addBtn && emptyRow && totalFormsInput){
+        addBtn.addEventListener('click', function(){
+          const idx = parseInt(totalFormsInput.value, 10) || 0;
+          const newRow = document.createElement('tr');
+          newRow.className = 'detail-row';
+          // replace prefix tokens in the empty form HTML with the new index
+          let html = emptyRow.innerHTML.replace(/__prefix__/g, idx);
+          newRow.innerHTML = html;
+          // Before appending, ensure input/select name attributes are unique (they are after __prefix__ replacement)
+          tbody.appendChild(newRow);
+          totalFormsInput.value = idx + 1;
+          // If INITIAL_FORMS exists and was 0, leave it as is; no change needed for creation
+          attachRowListeners(newRow);
+          recalcAll();
+        });
+      }
+
+      // initial fill and calc
+      actualizarSueldo();
+      recalcAll();
+    })();
+  </script>
+  {% endif %}
+  {% endblock %}
+

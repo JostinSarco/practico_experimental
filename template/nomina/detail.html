@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Sobretiempo #{{ object.id }}</h1>
+<p>Empleado: {{ object.empleado }}</p>
+<p>Fecha: {{ object.fecha_registro }}</p>
+<p>Sueldo mensual: {{ object.sueldo_mensual }}</p>
+<p>Total calculado: {{ object.total_calculado }}</p>
+
+<h3>Detalles</h3>
+<table class="table">
+  <thead><tr><th>Tipo</th><th>Horas</th><th>Valor calculado</th></tr></thead>
+  <tbody>
+    {% for d in object.detalles.all %}
+    <tr>
+      <td>{{ d.tipo_sobretiempo }}</td>
+      <td>{{ d.numero_horas }}</td>
+      <td>{{ d.valor_calculado }}</td>
+      <td>
+        <a href="{% url 'nomina:detalle_edit' d.id %}">Editar</a> |
+        <a href="{% url 'nomina:detalle_delete' d.id %}">Borrar</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="3">No hay detalles</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<p>
+  <a class="btn btn-sm btn-success" href="{% url 'nomina:detalle_create' object.id %}">Añadir detalle</a>
+</p>
+
+<p>
+  <a class="btn btn-primary" href="{% url 'nomina:edit' object.id %}">Editar</a>
+  <a class="btn btn-danger" href="{% url 'nomina:delete' object.id %}">Eliminar</a>
+  <a class="btn btn-secondary" href="{% url 'nomina:list' %}">Volver</a>
+</p>
+{% endblock %}
